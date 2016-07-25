@@ -1,0 +1,127 @@
+<html>
+<head>
+    <script language="JavaScript" type="text/javascript" src="jquery-2.1.4.js"></script>
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Roboto:300,400,700|" rel="stylesheet"
+        type="text/css">
+    <link href="font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+
+        $(document).ready(function () {
+            console.log("in ready");
+            var myDays = ["Sunday", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+            var today = new Date();
+            var date1 = today.getDate();
+            var month1 = today.getMonth()
+            var thisday = today.getDay();
+            var day1 = myDays[thisday];
+            console.log(day1);
+            document.getElementById("date").innerHTML = date1 + '/' + month1;
+            document.getElementById("day").innerHTML = day1;
+            var x = document.getElementById("demo");
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            }
+            function showPosition(position) {
+                //x.innerHTML = "Latitude: " + position.coords.latitude + 
+                //"<br>Longitude: " + position.coords.longitude;
+                console.log(position.coords.latitude);
+                console.log(position.coords.longitude);
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:1000/FindwetherbyGPS?lat=' + position.coords.latitude + '&lon=' + position.coords.longitude,
+                    success: function (data) {
+                        var message = JSON.parse(data);
+                        console.log(message);
+                        console.log(message);
+                        console.log(message.city);
+                        document.getElementById("CurrentCity").innerHTML = message.city.name;
+                        document.getElementById("tem").innerHTML = message.list[0].temp.max;
+                        document.getElementById("clouds").innerHTML = message.list[0].clouds;
+                        document.getElementById("wind").innerHTML = message.list[0].speed;
+                        for (i = 1; i <= 14; i++) {
+                            ++thisday;
+                            if (thisday > 7) {
+                                thisday = thisday - 7;
+                            }
+                            $('#forecast').append('<div class="forecast"><div class="forecast-header"><div class="day">' + (myDays[thisday]) + '</div></div><div class="forecast-content"><div class="degree">' + Math.round(message.list[i].temp.max) + '<sup>o</sup>C</div><small>' + message.list[i].clouds + '%</small></div></div>');
+                        }
+                    },
+                    error: function (message) {
+                        alert(message);
+                        console.log(message);
+                    }
+                });
+            }
+        });
+        function find() {
+            var city = document.getElementById("CityName").value;
+            console.log("in abc");
+            console.log(city);
+            $.ajax({
+                type: 'POST',
+                url: 'http://localhost:1000/Findwether?name=' + city,
+                success: function (data) {
+                    var message = JSON.parse(data);
+                    console.log(message);
+                    $('#morecity').append('<div class="forecast-container"><div class="today forecast"><div class="forecast-content"><div class="location">' + message.city.name + '</div><div class="degree"><div class="num">' + message.list[0].temp.max + '<sup>o</sup>C</div></div><span><img src="icon-umberella.png" alt="">' + message.list[0].clouds + '</span><span><img src="icon-wind.png" alt=""><span>' + message.list[0].speed + '</span>km/h</span></div></div><div id=forecast' + message.city.name + '></div></div></br></br></br></br>');
+                    for (i = 1; i <= 14; i++) {
+                        $('#forecast' + message.city.name).append('<div class="forecast"><div class="forecast-content"><div class="degree">' + Math.round(message.list[i].temp.max) + '<sup>o</sup>C</div><small>' + message.list[i].clouds + '%</small></div></div></div>');
+                    }
+                },
+                error: function (message) {
+                    alert(message);
+                    console.log(message);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <br></br>
+        <form action="#" class="find-location">
+        <input type="text" placeholder="Find your location..." id="CityName">
+        <input type="submit" value="Find" onclick="find()">
+        </form>
+        <br></br>
+        <br></br>
+        <br></br>
+        <div class="forecast-table">
+            <div class="container">
+                <div class="forecast-container">
+                    <div class="today forecast">
+                        <div class="forecast-header">
+                            <div class="day">
+                                <span id="day"></span>
+                            </div>
+                            <div class="date">
+                                <span id="date"></span>
+                            </div>
+                        </div>
+                        <div class="forecast-content">
+                            <div class="location" id="CurrentCity">
+                            </div>
+                            <div class="degree">
+                                <div class="num">
+                                    <span id="tem"></span><sup>o</sup>C</div>
+                            </div>
+                            <span>
+                                <img src="icon-umberella.png" alt=""><span id="clouds"></span></span>
+                            <span>
+                                <img src="icon-wind.png" alt=""><span id="wind"></span>km/h</span>
+                        </div>
+                    </div>
+                    <div id="forecast">
+                    </div>
+                </div>
+                <br></br>
+                <br></br>
+                <div id="morecity">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
