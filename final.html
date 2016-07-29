@@ -7,7 +7,7 @@
     <link href="font-awesome.min.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="style.css">
     <script>
-
+    var count=1;
         $(document).ready(function () {
             console.log("in ready");
             var myDays = ["Sunday", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -59,15 +59,16 @@
             var city = document.getElementById("CityName").value;
             console.log("in abc");
             console.log(city);
+			count++;
             $.ajax({
                 type: 'POST',
                 url: 'http://localhost:1000/Findwether?name=' + city,
                 success: function (data) {
                     var message = JSON.parse(data);
                     console.log(message);
-                    $('#morecity').append('<div class="forecast-container"><div class="today forecast"><div class="forecast-content"><div class="location">' + message.city.name + '</div><div class="degree"><div class="num">' + message.list[0].temp.max + '<sup>o</sup>C</div></div><span><img src="icon-umberella.png" alt="">' + message.list[0].clouds + '</span><span><img src="icon-wind.png" alt=""><span>' + message.list[0].speed + '</span>km/h</span></div></div><div id=forecast' + message.city.name + '></div></div></br></br></br></br>');
+                    $('#morecity').append('<div class="forecast-container"><div class="today forecast"><div class="forecast-content"><div class="location">' + message.city.name + '</div><div class="degree"><div class="num">' + message.list[0].temp.max + '<sup>o</sup>C</div></div><span><img src="icon-umberella.png" alt="">' + message.list[0].clouds + '</span><span><img src="icon-wind.png" alt=""><span>' + message.list[0].speed + '</span>km/h</span></div></div><div id=forecast' + count + '></div></div></br></br></br></br>');
                     for (i = 1; i <= 14; i++) {
-                        $('#forecast' + message.city.name).append('<div class="forecast"><div class="forecast-content"><div class="degree">' + Math.round(message.list[i].temp.max) + '<sup>o</sup>C</div><small>' + message.list[i].clouds + '%</small></div></div></div>');
+                        $('#forecast' + count).append('<div class="forecast"><div class="forecast-content"><div class="degree">' + Math.round(message.list[i].temp.max) + '<sup>o</sup>C</div><small>' + message.list[i].clouds + '%</small></div></div></div>');
                     }
                 },
                 error: function (message) {
@@ -75,6 +76,7 @@
                     console.log(message);
                 }
             });
+			  console.log(count);
         }
     </script>
 </head>
